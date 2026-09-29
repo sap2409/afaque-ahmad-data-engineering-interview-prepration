@@ -1,0 +1,286 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Delta Lake Interview Prep</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+:root{
+  --bg:#F4F6F9; --surface:#FFFFFF; --surface2:#EBF0F5; --ink:#122033; --muted:#566779; --line:#D3DBE4;
+  --accent:#0A7680; --accent-soft:#DCF0F1; --warn:#9A6410; --warn-soft:#FBEFD9; --bad:#B0344D; --bad-soft:#F8E2E7;
+  --good:#2A7747; --good-soft:#DFF1E6;
+  --display:"Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --body:"IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --mono:"JetBrains Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --bg:#0C131B; --surface:#131D28; --surface2:#1A2734; --ink:#E2E9F1; --muted:#95A5B7; --line:#2A3A4B;
+    --accent:#44BCC5; --accent-soft:#123339; --warn:#E6AE50; --warn-soft:#352914; --bad:#EC7A91; --bad-soft:#3A1C24;
+    --good:#62C58D; --good-soft:#15312A;
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#0C131B; --surface:#131D28; --surface2:#1A2734; --ink:#E2E9F1; --muted:#95A5B7; --line:#2A3A4B;
+  --accent:#44BCC5; --accent-soft:#123339; --warn:#E6AE50; --warn-soft:#352914; --bad:#EC7A91; --bad-soft:#3A1C24;
+  --good:#62C58D; --good-soft:#15312A;
+}
+*{box-sizing:border-box}
+body{background:var(--bg); color:var(--ink); font-family:var(--body); font-size:16px; line-height:1.6; padding-inline:16px; padding-block:0 64px}
+.wrap{max-width:920px; margin:0 auto}
+header{padding-block:44px 20px}
+.eyebrow{font-family:var(--mono); font-size:12px; letter-spacing:.08em; text-transform:uppercase; color:var(--accent)}
+h1{font-family:var(--display); font-weight:800; font-size:clamp(2rem,5vw,3.2rem); line-height:1.04; margin:.3em 0 .3em; letter-spacing:-.02em; text-wrap:balance}
+h1 span{color:var(--accent)}
+header p{color:var(--muted); max-width:66ch; margin:0}
+.stats{display:flex; flex-wrap:wrap; gap:10px; margin-top:18px}
+.stat{background:var(--surface); border:1px solid var(--line); border-radius:10px; padding:10px 14px; min-width:120px}
+.stat b{font-family:var(--display); font-size:1.5rem; display:block; line-height:1.1}
+.stat span{font-size:12.5px; color:var(--muted)}
+.bar{height:6px; background:var(--surface2); border-radius:99px; margin-top:6px; overflow:hidden}
+.bar i{display:block; height:100%; width:0; background:var(--good); transition:width .3s}
+
+.controls{position:sticky; top:env(safe-area-inset-top,0px); z-index:5; background:var(--bg); padding-block:12px; border-bottom:1px solid var(--line); display:flex; flex-direction:column; gap:10px}
+.row{display:flex; flex-wrap:wrap; gap:8px; align-items:center}
+input[type=search]{font:inherit; font-size:14px; flex:1 1 220px; min-width:0; background:var(--surface); color:var(--ink); border:1px solid var(--line); border-radius:8px; padding:7px 12px}
+button,.chip{font:inherit; font-size:13px; background:var(--surface); color:var(--ink); border:1px solid var(--line); border-radius:999px; padding:5px 12px; cursor:pointer; white-space:nowrap}
+button:hover,.chip:hover{border-color:var(--accent)}
+.chip[aria-pressed="true"]{background:var(--accent); border-color:var(--accent); color:var(--surface)}
+.chips{display:flex; gap:6px; overflow-x:auto; scrollbar-width:none; padding-bottom:2px}
+.lbl{font-family:var(--mono); font-size:11px; letter-spacing:.06em; text-transform:uppercase; color:var(--muted); margin-right:2px}
+:focus-visible{outline:2px solid var(--accent); outline-offset:2px}
+
+.topic{margin-top:30px}
+.topic h2{font-family:var(--display); font-weight:800; font-size:1.4rem; margin:0 0 10px; display:flex; align-items:baseline; gap:10px}
+.topic h2 small{font-family:var(--mono); font-size:12px; color:var(--muted); font-weight:400}
+.q{background:var(--surface); border:1px solid var(--line); border-radius:10px; margin-bottom:8px}
+.q.known{border-color:color-mix(in srgb, var(--good) 45%, var(--line))}
+.q summary{list-style:none; cursor:pointer; padding:12px 14px; display:grid; grid-template-columns:auto 1fr auto; gap:12px; align-items:start}
+.q summary::-webkit-details-marker{display:none}
+.num{font-family:var(--mono); font-size:12px; color:var(--muted); padding-top:3px; min-width:28px}
+.qt{font-weight:500}
+.lv{font-family:var(--mono); font-size:11px; padding:2px 8px; border-radius:999px; white-space:nowrap; margin-top:2px}
+.lv.B{background:var(--good-soft); color:var(--good)}
+.lv.I{background:var(--warn-soft); color:var(--warn)}
+.lv.A{background:var(--bad-soft); color:var(--bad)}
+.lv.S{background:var(--accent-soft); color:var(--accent)}
+.ans{padding:0 14px 14px 54px; font-size:15px}
+.ans p{margin:0 0 8px; max-width:72ch}
+.ans ul,.ans ol{margin:0 0 8px; padding-left:20px}
+.ans li{margin-bottom:3px}
+.ans code{font-family:var(--mono); font-size:.84em; background:var(--surface2); padding:1px 5px; border-radius:4px}
+.ans pre{font-family:var(--mono); font-size:12.5px; background:var(--surface2); border-radius:8px; padding:10px 12px; overflow-x:auto; margin:6px 0 10px}
+.ans table{border-collapse:collapse; font-size:13.5px; margin:4px 0 10px; width:100%}
+.ans .tw{overflow-x:auto}
+.ans th,.ans td{border:1px solid var(--line); padding:6px 8px; text-align:left; vertical-align:top}
+.ans th{background:var(--surface2); font-weight:600}
+.tip{background:var(--accent-soft); border-radius:8px; padding:8px 12px; font-size:14px; margin-top:8px; max-width:72ch}
+.tip b{font-family:var(--mono); font-size:11px; letter-spacing:.06em; text-transform:uppercase; color:var(--accent); margin-right:6px}
+.foot{display:flex; justify-content:flex-end; margin-top:6px}
+.foot label{font-size:13px; color:var(--muted); display:flex; gap:6px; align-items:center; cursor:pointer}
+.empty{color:var(--muted); padding:30px 0; text-align:center}
+@media (max-width:620px){ .ans{padding-left:14px} .q summary{grid-template-columns:auto 1fr} .q summary .lv{grid-column:2; justify-self:start} }
+</style>
+
+<div class="wrap">
+<header>
+  <div class="eyebrow">Databricks study guide · Interview prep</div>
+  <h1>Delta Lake <span>Interview</span> Prep</h1>
+  <p>Questions and model answers drawn from the Delta Lake masterclass notes, from fundamentals through internals, performance tuning and real-world scenarios. Try answering out loud before you open each card, then tick the ones you know.</p>
+  <div class="stats">
+    <div class="stat"><b id="sTotal">–</b><span>questions</span></div>
+    <div class="stat"><b id="sKnown">0</b><span>marked known</span><div class="bar"><i id="sBar"></i></div></div>
+    <div class="stat"><b id="sShown">–</b><span>matching filters</span></div>
+  </div>
+</header>
+
+<div class="controls">
+  <div class="row">
+    <input type="search" id="search" placeholder="Search questions and answers (e.g. VACUUM, MERGE, checkpoint)" aria-label="Search">
+    <button type="button" id="openAll">Open all</button>
+    <button type="button" id="shuffle">Random question</button>
+  </div>
+  <div class="row">
+    <span class="lbl">Level</span>
+    <div class="chips" id="levels"></div>
+    <span class="lbl" style="margin-left:8px">Show</span>
+    <div class="chips" id="knownF"></div>
+  </div>
+  <div class="chips" id="topics"></div>
+</div>
+
+<div id="list"></div>
+</div>
+
+<script>
+var QS = [
+/* ---------- Fundamentals ---------- */
+{t:"Fundamentals",l:"B",q:"What is Delta Lake and why was it created?",a:`<p>Delta Lake is an open-source storage layer that sits on top of Parquet files in object storage (ADLS, S3, GCS) and adds a <b>transaction log</b> (<code>_delta_log</code>). It turns a folder of files into a reliable table.</p><p>It was built to fix three data-lake problems:</p><ol><li><b>No ACID transactions.</b> A failed job could leave partial or corrupt data.</li><li><b>No UPDATE / DELETE / MERGE.</b> Parquet files are immutable, so changes meant read → modify → rewrite by hand.</li><li><b>No schema enforcement.</b> Records with different shapes pile up and readers have to cope.</li></ol><p>On top of that it adds time travel, schema evolution, unified batch + streaming and an audit history.</p>`,tip:"Frame it as: lake flexibility and cost + warehouse reliability, which is the lakehouse idea."},
+{t:"Fundamentals",l:"B",q:"What does a Delta table look like on disk?",a:`<ul><li><b>Data files</b>: <code>part-….snappy.parquet</code> (optionally in partition folders)</li><li><b><code>_delta_log/</code></b>: one JSON commit per version (<code>00000000000000000000.json</code>, <code>…001.json</code>), <code>.crc</code> checksum files, periodic <code>checkpoint.parquet</code> files and a <code>_last_checkpoint</code> pointer</li><li><b>Deletion vector files</b> (<code>deletion_vector_….bin</code>) when DVs are enabled</li></ul><p>Remove <code>_delta_log</code> and you are left with a plain Parquet folder.</p>`},
+{t:"Fundamentals",l:"I",q:"What actions are recorded inside a commit JSON file?",a:`<ul><li><code>commitInfo</code>: operation (WRITE, UPDATE, MERGE…), user, timestamp, operation metrics</li><li><code>metaData</code>: table schema, partition columns, table properties</li><li><code>protocol</code>: minimum reader/writer versions and table features</li><li><code>add</code>: a data file joining the table, with path, size, partition values, optional deletion vector and <b>stats</b> (numRecords, minValues, maxValues, nullCount)</li><li><code>remove</code>: a data file leaving the table (logical removal only)</li></ul>`},
+{t:"Fundamentals",l:"I",q:"Why are the min/max statistics stored in the log so important?",a:`<p>They enable <b>data skipping</b>. For a filter like <code>WHERE customer_id = 201</code>, Spark checks each file's min/max for that column in the log and skips files whose range can't contain the value, without opening them.</p><p>That is why data layout (OPTIMIZE, Z-ORDER, liquid clustering) matters: tighter, non-overlapping ranges mean more files skipped.</p>`,tip:"Connect stats → skipping → layout. It shows you understand why the optimization commands exist."},
+
+/* ---------- ACID & log ---------- */
+{t:"ACID & transaction log",l:"B",q:"Explain ACID with a simple example for each property.",a:`<ul><li><b>Atomicity</b> (all or nothing): a transfer debits savings then crashes before crediting checking. Without atomicity the money vanishes; with it the whole transfer rolls back.</li><li><b>Consistency</b> (rules hold): a $100 balance with two concurrent purchases of $80 and $60 must not end up spending $140. Rules such as balance ≥ amount keep the DB valid.</li><li><b>Isolation</b> (no interference): a reader sees the last committed version, never another writer's half-finished changes.</li><li><b>Durability</b>: once committed, the change survives crashes. The commit is recorded in a log before it is considered done.</li></ul>`},
+{t:"ACID & transaction log",l:"I",q:"How does Delta give you atomic commits on plain object storage?",a:`<p>Writers first write new Parquet files. At that point they are invisible because nothing references them. The commit is a <b>single new JSON file</b> <code>N.json</code> in <code>_delta_log</code>, created atomically so only one writer can create a given version.</p><p>Readers build the table only from committed log entries. So the change is either fully visible (the JSON exists) or not at all, and a crashed job just leaves orphan files that VACUUM later removes.</p>`},
+{t:"ACID & transaction log",l:"I",q:"How does Delta compute the current state (snapshot) of a table?",a:`<p>It replays the log in order: start from the latest checkpoint (if any), then apply each later JSON commit. Every <code>add</code> puts a file in the set and every <code>remove</code> takes it out. The files left, each with its deletion vector if present, <b>are</b> the current table.</p><p>Example: CTAS adds 1.parquet; INSERT adds 2.parquet; UPDATE removes 2.parquet, re-adds it with DV1 and adds 3.parquet; DELETE swaps DV1 for DV2. The snapshot is 1.parquet, 2.parquet with DV2, 3.parquet.</p>`},
+{t:"ACID & transaction log",l:"A",q:"Walk me through what the log records when you UPDATE a single row (deletion vectors enabled).",a:`<p>Three actions in one commit:</p><ol><li><code>remove</code> the original file. This does not delete it; it means "stop reading this file as a whole".</li><li><code>add</code> the <b>same file</b> again with a deletion vector marking the old row as deleted.</li><li><code>add</code> a <b>new small Parquet file</b> containing just the updated row.</li></ol><p>So an UPDATE is a delete plus an insert. Without deletion vectors (copy-on-write) it instead removes the old file and adds a fully rewritten copy.</p>`,tip:"Say clearly that 'remove' is logical. Interviewers often probe whether you think files get deleted immediately."},
+{t:"ACID & transaction log",l:"I",q:"What are checkpoint files and why does Delta need them?",a:`<p>Busy tables accumulate thousands of JSON commits, and replaying all of them on every read would be slow. Periodically Delta writes <code>N.checkpoint.parquet</code>: the fully reduced table state up to version N (adds and removes already cancelled), in columnar Parquet.</p><p>A reader follows <code>_last_checkpoint</code> to the newest checkpoint and applies only the JSON commits after it. Open-source Delta checkpoints every 10 commits by default; Databricks tunes the interval (the lab observed 36).</p>`},
+{t:"ACID & transaction log",l:"A",q:"What's the difference between a compacted JSON (e.g. 1.6.compacted.json) and a checkpoint?",a:`<div class="tw"><table><tr><th></th><th>Compacted JSON</th><th>Checkpoint</th></tr><tr><td>Content</td><td>Raw actions from a range of commits concatenated; add/remove pairs are <b>not</b> cancelled</td><td>Fully reduced state; removes already applied</td></tr><tr><td>Format</td><td>JSON</td><td>Parquet</td></tr><tr><td>Purpose</td><td>Avoid opening many tiny files</td><td>Let readers skip all history before it</td></tr></table></div>`},
+{t:"ACID & transaction log",l:"B",q:"Does DELETE physically remove data from storage?",a:`<p>No. DELETE (and UPDATE, MERGE, OPTIMIZE) only changes the log: files are <code>remove</code>d (tombstoned), or rows are hidden via a deletion vector. The bytes stay on storage, which is what makes time travel possible, until <code>VACUUM</code> deletes tombstoned files older than the retention period.</p>`,tip:"Important for GDPR 'right to be forgotten': you need DELETE and then VACUUM (and to purge DVs) for data to really disappear."},
+
+/* ---------- Concurrency ---------- */
+{t:"Concurrency",l:"B",q:"What is the difference between pessimistic and optimistic concurrency control?",a:`<ul><li><b>Pessimistic</b>: assumes conflicts will happen. A transaction takes an exclusive lock and others wait. It is correct, but throughput collapses when many transactions queue.</li><li><b>Optimistic</b>: assumes conflicts are rare. No locks. Everyone reads and works in parallel; at commit time a transaction checks whether the table changed since it read. If it did, it fails and retries on fresh data.</li></ul><p>Delta uses <b>optimistic concurrency control</b> to provide isolation.</p>`},
+{t:"Concurrency",l:"I",q:"How does optimistic concurrency control work in Delta, step by step?",a:`<ol><li>Record the table version you started from (say v1) and read that snapshot.</li><li>Do the work and write new data files (not yet visible).</li><li>Try to commit as the next version.</li><li>If someone else already committed in between, Delta checks whether their changes conflict with yours (e.g. touched the same files you read or rewrote).</li><li>No conflict: commit on top automatically. Conflict: your transaction fails with a concurrent-modification error and must retry from the latest version.</li></ol><p>Readers are never blocked: they always see the last committed version.</p>`},
+{t:"Concurrency",l:"A",q:"Two jobs write to the same Delta table at the same time. When will one of them fail?",a:`<p>It depends on what they touch:</p><ul><li><b>Two blind appends</b> (INSERT without reading the table) generally don't conflict; both succeed.</li><li><b>UPDATE / DELETE / MERGE on overlapping data</b>: if the second writer read or rewrote files that the first already removed or changed, it fails (e.g. <code>ConcurrentUpdateException</code>, <code>ConcurrentDeleteReadException</code>).</li></ul><p>Ways to reduce conflicts: make operations touch disjoint data (partition or cluster by the column you filter on, add that predicate to MERGE conditions), serialize the conflicting jobs, or add retry logic. Row-level concurrency on newer Databricks runtimes (with deletion vectors) also cuts false conflicts.</p>`,tip:"Mentioning the explicit predicate in the MERGE ON clause to narrow the files read is a strong practical point."},
+{t:"Concurrency",l:"I",q:"Why is optimistic concurrency a good fit for analytics / lakehouse tables?",a:`<p>These workloads are <b>read-heavy</b> with relatively few concurrent writers, so conflicts are rare. With OCC nobody pays the cost of locks, readers are never blocked, and the rare conflicting writer simply retries. Locking would make every reader and writer wait even though collisions almost never happen.</p>`},
+
+/* ---------- Time travel ---------- */
+{t:"Time travel",l:"B",q:"What is time travel in Delta and how do you use it?",a:`<p>Every commit creates a version; you can query or restore any version still backed by files.</p><pre>DESCRIBE HISTORY t;
+SELECT * FROM t VERSION AS OF 3;
+SELECT * FROM t TIMESTAMP AS OF '2025-05-01 09:35:00';
+RESTORE TABLE t TO VERSION AS OF 0;</pre><p>Use cases: auditing, reproducing ML training data, debugging pipelines, undoing bad writes.</p>`},
+{t:"Time travel",l:"I",q:"You query TIMESTAMP AS OF a time where no commit happened. What do you get?",a:`<p>The <b>latest version committed at or before</b> that timestamp. In the lab, v2 was at 9:31 and v3 at 9:57; querying 9:35 returned v2.</p>`},
+{t:"Time travel",l:"I",q:"Does RESTORE delete the versions that came after the restore point?",a:`<p>No. RESTORE writes a <b>new commit</b> whose state matches the old version, so history only moves forward. You could even restore back to the version before the restore.</p>`},
+{t:"Time travel",l:"A",q:"When does time travel stop working?",a:`<ul><li>When <b>VACUUM</b> has physically deleted the data files an older version needs. In the lab, after <code>VACUUM RETAIN 0 HOURS</code>, v0 and v2 still worked but v1 failed because its file was gone.</li><li>When old log entries expire (<code>delta.logRetentionDuration</code>, 30 days by default) and the version is no longer described by the log.</li></ul><p>To keep N days of time travel, keep <code>delta.deletedFileRetentionDuration</code> (VACUUM retention) and log retention at least N days.</p>`},
+{t:"Time travel",l:"B",q:"How do you read an older version with PySpark?",a:`<pre>spark.read.option("versionAsOf", 2).table("catalog.db.t")
+spark.read.option("timestampAsOf", "2025-05-01 09:31:00").table("catalog.db.t")</pre>`},
+
+/* ---------- Schema ---------- */
+{t:"Schema",l:"B",q:"Schema-on-read vs schema-on-write: which one is Delta?",a:`<ul><li><b>Schema-on-read</b> (data lake): ingest anything, apply a schema when reading. Inconsistent shapes are only discovered at query time.</li><li><b>Schema-on-write</b> (warehouse, Delta): data is validated against the table schema <b>before</b> it lands; mismatches are rejected or cast.</li></ul><p>Delta is schema-on-write, which is what "schema enforcement" means.</p>`},
+{t:"Schema",l:"I",q:"A source DataFrame has the same columns as the target but in a different order. What happens with INSERT vs MERGE?",a:`<ul><li><b>INSERT INTO … SELECT</b> maps columns <b>by position</b>. If the swapped columns have compatible types it succeeds silently and writes values into the wrong columns (quantity lands in customer_id). This is silent corruption.</li><li><b>MERGE</b> (<code>INSERT *</code> / <code>UPDATE SET *</code>) maps <b>by name</b>, so it is correct.</li></ul><p>Safer alternatives: list columns explicitly, use <code>INSERT … BY NAME</code>, or use MERGE.</p>`,tip:"This is a favourite trick question. Say 'position vs name' in the first sentence."},
+{t:"Schema",l:"I",q:"What does Delta do if you insert a value of the wrong data type?",a:`<p>It attempts an <b>implicit cast</b> to the column type. <code>'99499'</code> into INT works, <code>'2025-01-01'</code> into DATE works, but <code>'ABC'</code> into INT fails with a cast error. Garbage that can't be converted is rejected.</p>`},
+{t:"Schema",l:"I",q:"The source has columns renamed (c_id, qty). What happens with INSERT vs MERGE?",a:`<ul><li><b>INSERT</b> succeeds because names are ignored and only position matters.</li><li><b>MERGE</b> fails with "cannot resolve customer_id" because it looks up every target column by name in the source.</li></ul>`},
+{t:"Schema",l:"I",q:"The source has an extra column the target doesn't have (schema evolution off). INSERT vs MERGE?",a:`<ul><li><b>INSERT</b> fails with a schema mismatch error.</li><li><b>MERGE … INSERT *</b> succeeds: it fills every target column by name and ignores the extra source column.</li></ul>`},
+{t:"Schema",l:"B",q:"How can you enforce data-quality rules on a Delta table?",a:`<ul><li><code>NOT NULL</code> on columns, e.g. <code>customer_id INT NOT NULL</code></li><li><code>CHECK</code> constraints: <code>ALTER TABLE t ADD CONSTRAINT price_pos CHECK (price &gt; 0)</code></li></ul><p>Any write that violates a constraint fails as a whole, so bad rows never land partially.</p>`},
+{t:"Schema",l:"B",q:"What's the difference between schema enforcement and schema evolution?",a:`<p><b>Enforcement</b> rejects writes that don't match the table schema. <b>Evolution</b> deliberately changes the table schema (add columns, widen types, nested fields, reorder) without rewriting existing data. Evolution can be manual (<code>ALTER TABLE</code>) or automatic (autoMerge / mergeSchema).</p>`},
+{t:"Schema",l:"I",q:"How do you enable automatic schema evolution?",a:`<pre>-- SQL session
+SET spark.databricks.delta.schema.autoMerge.enabled = true;
+
+# DataFrame write
+df.write.mode("append").option("mergeSchema", "true").saveAsTable("t")</pre><p>New columns are added to the table schema; existing rows get NULL for them.</p>`},
+{t:"Schema",l:"A",q:"What is type widening and what are its requirements?",a:`<p>Changing a column to a wider type without rewriting data: INT → BIGINT, FLOAT → DOUBLE, VARCHAR(n) → larger. It needs <b>Delta 3.2+</b> (Databricks Runtime 15.4 in the lab) and the table property:</p><pre>ALTER TABLE t SET TBLPROPERTIES ('delta.enableTypeWidening' = 'true');
+ALTER TABLE t ALTER COLUMN customer_id TYPE BIGINT;</pre><p>In the lab, auto-merge alone did <b>not</b> widen during an INSERT ("cannot assign BIGINT to INT"); the explicit ALTER was required.</p>`},
+{t:"Schema",l:"I",q:"How do you evolve a nested STRUCT column?",a:`<pre>ALTER TABLE t ALTER COLUMN purchase_details.mall_pin_code TYPE BIGINT;
+ALTER TABLE t ADD COLUMN purchase_details.store_location STRING;</pre><p>With auto-merge on you can insert a new nested key directly, but use <code>named_struct('mall_pin_code', …, 'staff_id', 'ST01')</code> so Delta knows which field each value belongs to. Older rows get NULL for the new field.</p>`},
+{t:"Schema",l:"A",q:"How do you add a column in a specific position, and how does automatic evolution handle position?",a:`<p>Manually: <code>ALTER TABLE t ADD COLUMN age INT AFTER price</code> (or <code>FIRST</code>).</p><p>Automatically:</p><ul><li><b>INSERT</b> with a new column placed mid-list fails, because positional mapping shifts every following column (e.g. "cannot cast string to struct").</li><li><b>MERGE</b> succeeds but appends the new column <b>at the end</b>, not where it appeared in the source.</li></ul>`},
+{t:"Schema",l:"I",q:"Would you turn on automatic schema evolution in production?",a:`<p>Usually only on raw/bronze ingestion, where capturing new upstream fields matters more than a fixed shape. On curated silver/gold tables I'd keep it off and use explicit <code>ALTER TABLE</code> via reviewed changes, so an upstream mistake (a typo'd column, a renamed field) can't silently reshape a table that reports and models depend on.</p>`,tip:"Interviewers like a nuanced 'it depends on the layer' answer here."},
+
+/* ---------- Tables & setup ---------- */
+{t:"Tables & setup",l:"B",q:"What's the difference between managed and external tables?",a:`<div class="tw"><table><tr><th></th><th>Managed</th><th>External</th></tr><tr><td>Data location</td><td>Unity Catalog managed storage</td><td>A path you specify (LOCATION)</td></tr><tr><td>Metadata</td><td>Unity Catalog</td><td>Unity Catalog</td></tr><tr><td>DROP TABLE</td><td>Data is deleted (after a retention window, often ~30 days in UC)</td><td>Only the definition is dropped; files remain</td></tr><tr><td>Formats</td><td>Delta</td><td>Delta, Parquet, CSV, JSON…</td></tr></table></div>`},
+{t:"Tables & setup",l:"B",q:"How do you convert existing Parquet data to Delta? Does it rewrite the data?",a:`<pre>CONVERT TO DELTA parquet.\`abfss://container@acct.dfs.core.windows.net/path\`;
+-- or
+DeltaTable.convertToDelta(spark, "parquet.\`/path\`")</pre><p>No rewrite: it creates <code>_delta_log</code> with a commit that <code>add</code>s the existing Parquet files (and collects stats). CSV/JSON must be read and rewritten with <code>.format("delta")</code>.</p>`},
+{t:"Tables & setup",l:"I",q:"In Unity Catalog on Azure, how does Databricks get access to your storage?",a:`<ul><li>An <b>Access Connector for Azure Databricks</b> (a managed identity) is granted <b>Storage Blob Data Contributor</b> on the ADLS Gen2 account.</li><li>The metastore is created with a root path (<code>abfss://metastore@acct.dfs.core.windows.net/</code>) plus the connector's resource ID, then assigned to the workspace.</li><li>For other paths you create a <b>storage credential</b> (backed by the connector) and an <b>external location</b> (path + credential). Without it, <code>%fs ls abfss://…</code> fails with a configuration error.</li></ul>`},
+
+/* ---------- Deletion vectors ---------- */
+{t:"Deletion vectors",l:"B",q:"What are deletion vectors?",a:`<p>Small bitmap files recording which rows of a Parquet file are deleted. Instead of rewriting a whole (possibly huge) file to remove a few rows, Delta writes a DV and readers skip those rows. Enabled with <code>'delta.enableDeletionVectors' = 'true'</code>.</p>`},
+{t:"Deletion vectors",l:"I",q:"Explain copy-on-write vs merge-on-read. When would you choose each?",a:`<ul><li><b>Copy-on-write</b> (DVs off): every UPDATE/DELETE/MERGE rewrites the affected files. Writes are slow, reads are fast and clean. Good for <b>read-heavy, rarely-updated</b> tables.</li><li><b>Merge-on-read</b> (DVs on): changes go into deletion vectors (plus small new files for updated rows) and are applied when reading. Writes are fast, with a small read-time cost. Good for <b>frequently updated</b> tables (CDC, MERGE-heavy pipelines).</li></ul><p>Neither wins everywhere; it's a write-latency vs read-cost trade-off.</p>`},
+{t:"Deletion vectors",l:"I",q:"How can you tell from DESCRIBE HISTORY whether a delete used copy-on-write or deletion vectors?",a:`<p>Check <code>operationMetrics</code>. For deleting one row from a 100-row file:</p><ul><li>CoW: <code>numRemovedFiles=1</code>, <code>numCopiedRows=99</code>, <code>numAddedFiles=1</code></li><li>DV: <code>numRemovedFiles=0</code>, <code>numCopiedRows=0</code>, <code>numDeletionVectorsAdded=1</code></li></ul>`},
+{t:"Deletion vectors",l:"A",q:"What are the downsides of deletion vectors, and how do you clean them up?",a:`<p>Over time you accumulate many DVs and small files for updated rows, so reads do more work. Also, deleted rows still physically exist in the original files.</p><ul><li><code>OPTIMIZE</code> rewrites files, applying DVs, into fresh compact files.</li><li><code>REORG TABLE t APPLY (PURGE)</code> rewrites files specifically to purge soft-deleted data.</li><li>Then <code>VACUUM</code> physically removes the old files (needed for true data deletion / compliance).</li></ul>`},
+
+/* ---------- Cloning ---------- */
+{t:"Cloning",l:"B",q:"What is the difference between a shallow clone and a deep clone?",a:`<ul><li><b>Shallow clone</b>: copies only metadata; data files are <b>referenced</b> from the source. Fast, cheap, near-zero storage. Great for tests and experiments.</li><li><b>Deep clone</b>: copies metadata <b>and</b> data files, giving a fully independent table. Slower, more storage. Good for backups, DR and migrations.</li></ul><p>Both start a fresh history at version 0 (a checkpoint + <code>0.json</code> capturing the source's latest or chosen version), and after cloning, changes on either side don't affect the other.</p>`},
+{t:"Cloning",l:"I",q:"How is DEEP CLONE different from CREATE TABLE AS SELECT (CTAS)?",a:`<ul><li>CTAS only materializes the rows of a query; table properties, constraints, partitioning/clustering and other metadata are lost.</li><li>DEEP CLONE copies data <b>and</b> metadata and properties.</li><li>DEEP CLONE is <b>incremental</b>: re-running it into the same target copies only changes since the last clone, which is ideal for keeping a disaster-recovery replica in sync.</li></ul>`},
+{t:"Cloning",l:"I",q:"Can you time travel on a clone back into the source table's history?",a:`<p>No. A clone starts at version 0 with the source's state at clone time. To get an older source state, clone a specific version: <code>CREATE TABLE c SHALLOW CLONE t VERSION AS OF 0</code> (or <code>TIMESTAMP AS OF</code>).</p>`},
+{t:"Cloning",l:"A",q:"You VACUUM a source table that has shallow clones. What happens to files the clones still need?",a:`<p>In the lab (Unity Catalog managed tables), VACUUM on the source <b>kept</b> a deleted file while shallow clones still referenced it; the file was removed only after the row was deleted from every clone and VACUUM ran again.</p><p>Caveat: outside that tracking (e.g. path-based or non-UC tables), vacuuming the source can delete files a shallow clone points to and break it. That's why shallow clones are for short-lived use and deep clones for anything long-lived.</p>`,tip:"Mentioning the 'breaks outside UC' risk shows real-world awareness."},
+{t:"Cloning",l:"A",q:"Design a disaster-recovery copy of a critical Delta table.",a:`<ol><li>Initial <code>CREATE OR REPLACE TABLE dr.t DEEP CLONE prod.t</code> into a storage account in another region.</li><li>Schedule the same DEEP CLONE regularly (e.g. hourly). Each run is incremental and copies only the new or changed files.</li><li>Monitor the clone's history (source version) to measure lag; test failover periodically.</li></ol><p>Deep clone (not shallow) is required because the replica must not depend on the primary's files.</p>`},
+
+/* ---------- Performance ---------- */
+{t:"Performance",l:"B",q:"What is the small file problem?",a:`<p>When a table's data is spread over thousands of tiny files, Spark spends most of its time listing, opening, closing and reading metadata for files rather than reading data. Think of reading a 300-page novel saved as 300 separate PDFs. The result is wasted compute, poor I/O and slow queries.</p>`},
+{t:"Performance",l:"I",q:"What typically causes small files?",a:`<ol><li><b>Over-repartitioning</b>: 10 GB with <code>repartition(10000)</code> gives about 1 MB files.</li><li><b>Partitioning on a high-cardinality column</b>: thousands of partition values means thousands of tiny folders and files.</li><li><b>Frequent small writes</b>: streaming or micro-batches every few minutes each write small files. This is often a business requirement, so you compact on a schedule rather than "fix" it.</li></ol>`},
+{t:"Performance",l:"I",q:"How does OPTIMIZE work?",a:`<p>It compacts small files into larger ones (target ~<b>1 GB</b>, via <code>spark.databricks.delta.optimize.maxFileSize</code>) using <b>bin packing</b>: sort files by size descending and place each into the first bin with room, opening a new bin when none fits. Each bin becomes one new file.</p><p>In the log it records <code>remove</code> for the small files and <code>add</code> for the new ones; old files stay on disk (tombstoned) until VACUUM. Use a predicate for incremental work: <code>OPTIMIZE t WHERE date = '2025-05-04'</code>.</p>`},
+{t:"Performance",l:"I",q:"Optimized writes vs auto compaction: what's the difference?",a:`<div class="tw"><table><tr><th></th><th>Optimized writes</th><th>Auto compaction</th></tr><tr><td>When</td><td>During the write</td><td>Right after a write</td></tr><tr><td>How</td><td>Shuffles data so each partition gets one right-sized write instead of many small files from many executors</td><td>Runs a small OPTIMIZE when enough small files exist (<code>autoCompact.minNumFiles</code>, default 50)</td></tr><tr><td>Cost</td><td>Extra shuffle, higher write latency</td><td>Extra work after writes</td></tr><tr><td>Config</td><td><code>spark.databricks.delta.optimizeWrite.enabled</code></td><td><code>spark.databricks.delta.autoCompact.enabled</code></td></tr></table></div><p>Lab: optimized writes cut a query from 6.97 s to 1.82 s on a table written with <code>repartition(288)</code>.</p>`},
+{t:"Performance",l:"B",q:"What does VACUUM do, and does it make queries faster?",a:`<p>VACUUM physically deletes files that are no longer referenced by the current table version and are older than the retention threshold (default <b>168 hours / 7 days</b>).</p><p>It does <b>not</b> make queries faster: readers already use the log to read only live files. It saves <b>storage cost</b> and limits time travel to the retention window.</p>`,tip:"Correcting the 'VACUUM speeds up queries' misconception is a strong signal."},
+{t:"Performance",l:"I",q:"What are the risks of VACUUM … RETAIN 0 HOURS?",a:`<ul><li>You lose time travel to any version needing the deleted files.</li><li>Long-running readers or writers that started on an older snapshot can fail because their files disappear mid-job.</li><li>Delta blocks it by default; you must disable <code>spark.databricks.delta.retentionDurationCheck.enabled</code>. Fine in a lab, dangerous in production.</li></ul>`},
+{t:"Performance",l:"I",q:"What is Z-ORDER and how does it speed up queries?",a:`<p>Z-ORDER (always run with OPTIMIZE) sorts and rewrites data so rows with similar values in the chosen columns are <b>co-located in the same files</b>. Each file's min/max range becomes narrow with little overlap, so data skipping can prune most files.</p><p>For multiple columns it uses a Z-order space-filling curve, which maps multi-dimensional values to one dimension while preserving locality. Lab: 255 files all spanning customer_id 201–99,457 became 2 files with separate ranges; the query dropped from 785 ms to 144 ms.</p><pre>OPTIMIZE t ZORDER BY (customer_id);</pre>`},
+{t:"Performance",l:"A",q:"When would you partition vs Z-ORDER, and can you combine them?",a:`<ul><li><b>Partition</b> on a low-cardinality column you almost always filter on (date), with enough data per partition (roughly ≥ 1 GB).</li><li><b>Z-ORDER</b> on high-cardinality columns used in filters (customer_id). Partitioning on them would create the small file problem.</li><li>Combining is a common pattern: partition by date, then run <code>OPTIMIZE t WHERE date = &lt;yesterday&gt; ZORDER BY (customer_id)</code> for just the new partition.</li></ul><p>Z-ORDER's effectiveness drops as you add more columns, so keep it to the few most-filtered ones.</p>`},
+{t:"Performance",l:"B",q:"What is liquid clustering and what problems does it solve?",a:`<p>A data-layout method that replaces Hive partitioning and Z-ORDER. You declare <code>CLUSTER BY (cols)</code> and Delta clusters data incrementally.</p><ul><li><b>Flexible</b>: change keys any time with <code>ALTER TABLE … CLUSTER BY</code>, with no full rewrite when query patterns shift.</li><li><b>Avoids small files</b>: merges undersized groups into right-sized files.</li><li><b>Reduces file-level skew</b>: splits oversized groups so Spark tasks get balanced work (no single "2023" partition on the critical path).</li></ul>`},
+{t:"Performance",l:"I",q:"How do you choose liquid clustering keys, and how do you migrate an existing table?",a:`<p><b>Choosing:</b> the columns most frequently used in filters. If two columns are highly correlated (product_category ↔ location), keep only one.</p><p><b>Migrating:</b></p><ul><li>Hive-partitioned → cluster by the partition column</li><li>Z-ordered → cluster by the Z-ORDER columns</li><li>Partitioned + Z-ordered → cluster by both (e.g. invoice_date, customer_id)</li><li>Partitioned on a date derived from a timestamp → cluster by the original timestamp column</li></ul><p>Liquid clustering can't be combined with partitioning or Z-ORDER on the same table.</p>`},
+{t:"Performance",l:"A",q:"Does liquid clustering fix data skew in joins?",a:`<p>No. It balances <b>file sizes</b> so scan tasks get even input. Join or aggregation skew comes from a hot key during the <b>shuffle</b> (all rows for one key go to one partition), and clustering doesn't change shuffle behavior. For that you'd use AQE skew-join handling, salting or broadcast joins.</p>`},
+{t:"Performance",l:"I",q:"Compare Hive partitioning, Z-ORDER and liquid clustering.",a:`<div class="tw"><table><tr><th></th><th>Hive partitioning</th><th>Z-ORDER</th><th>Liquid clustering</th></tr><tr><td>Mechanism</td><td>One folder per value</td><td>Co-locates values inside files</td><td>Incremental clustering into balanced files</td></tr><tr><td>Column choice</td><td>Fixed up front</td><td>Chosen per OPTIMIZE run; changing means re-running over all data</td><td>Changeable any time</td></tr><tr><td>Cardinality</td><td>Low only</td><td>High is fine</td><td>High is fine</td></tr><tr><td>Small files / skew</td><td>Prone to both</td><td>Helps with small files</td><td>Handles both</td></tr><tr><td>Maintenance</td><td>None</td><td>Full re-optimize</td><td>Incremental OPTIMIZE</td></tr></table></div>`},
+
+/* ---------- Scenarios ---------- */
+{t:"Scenarios",l:"S",q:"A MERGE runs every 5 minutes and queries on the table are getting slower each week. What do you do?",a:`<ol><li><b>Diagnose</b>: <code>DESCRIBE DETAIL</code> (numFiles, sizeInBytes → average file size) and <code>DESCRIBE HISTORY</code> (files added per MERGE).</li><li><b>Reduce small files at write time</b>: enable optimized writes and/or auto compaction.</li><li><b>Make MERGE cheaper</b>: enable deletion vectors (merge-on-read) and cluster by the merge key so each MERGE touches fewer files; add partition/date predicates to the ON clause.</li><li><b>Maintain</b>: scheduled OPTIMIZE (incremental with liquid clustering), then VACUUM with the standard retention to control storage.</li></ol>`},
+{t:"Scenarios",l:"S",q:"Someone accidentally deleted rows from a production table yesterday. How do you recover?",a:`<ol><li><code>DESCRIBE HISTORY t</code> to find the bad DELETE and the version just before it.</li><li>Check the data: <code>SELECT … FROM t VERSION AS OF &lt;n&gt;</code>.</li><li>Recover:<ul><li>If nothing else has written since: <code>RESTORE TABLE t TO VERSION AS OF &lt;n&gt;</code>.</li><li>If good writes followed: re-insert only the missing rows, e.g. <code>INSERT INTO t SELECT * FROM t VERSION AS OF n EXCEPT SELECT * FROM t</code>, or MERGE them back.</li></ul></li></ol><p>This works as long as VACUUM hasn't removed those files. Yesterday is safe with the default 7-day retention.</p>`},
+{t:"Scenarios",l:"S",q:"An upstream team renamed customer_id to cust_id and your nightly MERGE started failing. Why, and how do you fix it?",a:`<p>MERGE resolves columns <b>by name</b>, so it can't find customer_id in the source ("cannot resolve customer_id"). That is actually the safe outcome; a positional INSERT would have silently written wrong data.</p><p>Fix: alias in the source query (<code>SELECT cust_id AS customer_id, …</code>) or agree a data contract with upstream, and add a schema check at the start of the pipeline so it fails with a clear message.</p>`},
+{t:"Scenarios",l:"S",q:"Your table is partitioned by country, but analysts now mostly filter by category. What are your options?",a:`<p>Partitioning is fixed up front, so filters on category get no pruning and scan everything. Options:</p><ul><li>Rewrite the table partitioned by category (expensive, and it may break if patterns shift again).</li><li>Keep the partitions and add <code>OPTIMIZE … ZORDER BY (category)</code>.</li><li><b>Best long-term</b>: move to liquid clustering, <code>CLUSTER BY (category)</code> (or country, category), and change keys later as needed without a full rewrite.</li></ul>`},
+{t:"Scenarios",l:"S",q:"Data scientists need a copy of a 5 TB production table to test a risky transformation. What do you give them?",a:`<p>A <b>shallow clone</b>: <code>CREATE TABLE sandbox.t SHALLOW CLONE prod.t</code>. It is created in seconds with no data copied; their writes go to new files and never affect prod, and prod changes don't leak in.</p><p>Caveats: it is short-lived by design, and it relies on prod files existing, so coordinate with VACUUM (safe under Unity Catalog reference tracking; risky otherwise). If they need it for months or in another workspace/region, use a deep clone.</p>`},
+{t:"Scenarios",l:"S",q:"An INT id column is about to overflow. How do you handle it without rewriting the table?",a:`<p>Use type widening:</p><pre>ALTER TABLE t SET TBLPROPERTIES ('delta.enableTypeWidening' = 'true');
+ALTER TABLE t ALTER COLUMN order_id TYPE BIGINT;</pre><p>Requires Delta 3.2+ (DBR 15.4+). Existing files aren't rewritten. Also check downstream consumers and schemas (e.g. views, BI extracts, streaming readers) that assume INT.</p>`},
+{t:"Scenarios",l:"S",q:"A pipeline inserts data with a SELECT, and a column was reordered upstream. Numbers look wrong but nothing failed. What happened?",a:`<p>INSERT maps by <b>position</b>. If the swapped columns had compatible types, Delta cast and wrote them into the wrong columns with no error. Schema enforcement checks types, not meaning.</p><p>Fix the data: find the bad versions with DESCRIBE HISTORY and RESTORE or re-load. Prevent it by listing columns explicitly, using <code>INSERT … BY NAME</code> or MERGE, and adding CHECK constraints or data-quality tests that catch implausible values.</p>`}
+];
+
+var LEVELS={B:"Basic",I:"Intermediate",A:"Advanced",S:"Scenario"};
+var state={q:"",topic:"All",level:"All",show:"All",known:{}};
+try{state.known=JSON.parse(localStorage.getItem("dlKnown")||"{}")||{}}catch(e){}
+function save(){try{localStorage.setItem("dlKnown",JSON.stringify(state.known))}catch(e){}}
+var topics=["All"];QS.forEach(function(x,i){x.id=i+1;if(topics.indexOf(x.t)<0)topics.push(x.t)});
+
+function chips(el,items,key,labels){
+  el.innerHTML="";
+  items.forEach(function(v){
+    var b=document.createElement("button");b.type="button";b.className="chip";
+    b.textContent=labels?labels[v]||v:v;b.setAttribute("aria-pressed",state[key]===v?"true":"false");
+    b.onclick=function(){state[key]=v;chips(el,items,key,labels);render()};el.appendChild(b);
+  });
+}
+chips(document.getElementById("topics"),topics,"topic");
+chips(document.getElementById("levels"),["All","B","I","A","S"],"level",{All:"All",B:"Basic",I:"Intermediate",A:"Advanced",S:"Scenario"});
+chips(document.getElementById("knownF"),["All","Unknown","Known"],"show",{All:"All",Unknown:"Still learning",Known:"Known"});
+
+function strip(h){var d=document.createElement("div");d.innerHTML=h;return d.textContent.toLowerCase()}
+QS.forEach(function(x){x.text=(x.q+" "+strip(x.a)+" "+(x.tip||"")).toLowerCase()});
+
+function render(){
+  var list=document.getElementById("list");list.innerHTML="";
+  var qs=state.q.trim().toLowerCase(),shown=0,groups={};
+  QS.forEach(function(x){
+    if(state.topic!=="All"&&x.t!==state.topic)return;
+    if(state.level!=="All"&&x.l!==state.level)return;
+    var k=!!state.known[x.id];
+    if(state.show==="Known"&&!k)return; if(state.show==="Unknown"&&k)return;
+    if(qs&&x.text.indexOf(qs)<0)return;
+    (groups[x.t]=groups[x.t]||[]).push(x);shown++;
+  });
+  topics.slice(1).forEach(function(t){
+    var g=groups[t];if(!g)return;
+    var sec=document.createElement("section");sec.className="topic";
+    sec.innerHTML='<h2>'+t+' <small>'+g.length+' Q</small></h2>';
+    g.forEach(function(x){
+      var d=document.createElement("details");d.className="q"+(state.known[x.id]?" known":"");
+      d.innerHTML='<summary><span class="num">Q'+x.id+'</span><span class="qt">'+x.q+'</span><span class="lv '+x.l+'">'+LEVELS[x.l]+'</span></summary>'+
+        '<div class="ans">'+x.a+(x.tip?'<div class="tip"><b>Interview tip</b>'+x.tip+'</div>':'')+
+        '<div class="foot"><label><input type="checkbox" id="k'+x.id+'" '+(state.known[x.id]?"checked":"")+'> I can answer this</label></div></div>';
+      d.querySelector("input").addEventListener("change",function(e){
+        if(e.target.checked)state.known[x.id]=1;else delete state.known[x.id];
+        d.classList.toggle("known",e.target.checked);save();stats();
+      });
+      sec.appendChild(d);
+    });
+    list.appendChild(sec);
+  });
+  if(!shown)list.innerHTML='<p class="empty">No questions match these filters.</p>';
+  document.getElementById("sShown").textContent=shown;stats();
+}
+function stats(){
+  var n=Object.keys(state.known).length;
+  document.getElementById("sTotal").textContent=QS.length;
+  document.getElementById("sKnown").textContent=n;
+  document.getElementById("sBar").style.width=(100*n/QS.length)+"%";
+}
+document.getElementById("search").addEventListener("input",function(e){state.q=e.target.value;render()});
+document.getElementById("openAll").addEventListener("click",function(){
+  var ds=document.querySelectorAll("details.q"),anyClosed=Array.prototype.some.call(ds,function(d){return !d.open});
+  ds.forEach(function(d){d.open=anyClosed});this.textContent=anyClosed?"Close all":"Open all";
+});
+document.getElementById("shuffle").addEventListener("click",function(){
+  var ds=document.querySelectorAll("details.q");if(!ds.length)return;
+  ds.forEach(function(d){d.open=false});
+  var d=ds[Math.floor(Math.random()*ds.length)];d.scrollIntoView({block:"center"});d.querySelector("summary").focus();
+});
+render();
+</script>
+
+</body></html>
